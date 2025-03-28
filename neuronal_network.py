@@ -5,19 +5,16 @@ import matplotlib.pyplot as plt
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from gensim.models import KeyedVectors
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sentence_transformers import SentenceTransformer
-
-
 
 
 #Größe des Netzwerkes festlegen (size = Anzahl der hiddenlayer + Input und Output)
 
 gr = [768,50,20,6]
 size = len(gr)
-transformer = 'nreimers/albert-small-v2'
+transformer = 'nreimers/albert-small-v2' #wurde offline genommen!
 
 #Weigths und Biases festlegen: Weights zufällig, Biases auf 0
 weight=[0]*size
@@ -68,7 +65,7 @@ nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 
 #Daten einlesen
-df=pd.read_csv(r"https://raw.githubusercontent.com/MariaAmPC/Sentiment-analysis/main/tweet_emotions.csv")
+df = pd.read_csv(f"https://raw.githubusercontent.com/Luismkl/Neuronal-Network/refs/heads/main/tweet_emotions.csv")
 
 emotions = ["neutral", "worry", "happiness", "sadness", "love", "hate"]
 df = df[df.sentiment.isin(emotions)]
