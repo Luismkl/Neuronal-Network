@@ -10,8 +10,11 @@ from sklearn.model_selection import train_test_split
 from sentence_transformers import SentenceTransformer
 
 
-#Größe des Netzwerkes festlegen (size = Anzahl der hiddenlayer + Input und Output)
+#Kann sehr lange zum Trainieren des NEuronalen Netzwerks brauchen. Funktioniert womöglich nicht mehr so gut wie am Anfang,
+# weil mittlerweile z.B der Transformer offline genommen wurde
 
+
+#Größe des Netzwerkes festlegen (size = Anzahl der hiddenlayer + Input und Output)
 gr = [768,50,20,6]
 size = len(gr)
 transformer = 'nreimers/albert-small-v2' #wurde offline genommen!
@@ -104,48 +107,31 @@ model = BertModelSingleton.get_instance()
 sentences = model.encode(df_train["content"].tolist())
 sentence_test = model.encode(df_test["content"].tolist())
 
+def convert_labels():
+    labels=np.empty((0,6))
+    for i in df_train['sentiment'].values:
+        if i == "neutral":
+            newrow = np.array([[1,0,0,0,0,0]])
+        elif i == "worry":
+            newrow = np.array([[0,1,0,0,0,0]])
+        elif i == "happiness":
+            newrow = np.array([[0,0,1,0,0,0]])
+        elif i == "sadness":
+            newrow = np.array([[0,0,0,1,0,0]])
+        elif i == "love":
+            newrow = np.array([[0,0,0,0,1,0]])
+        elif i == "hate":
+            newrow = np.array([[0,0,0,0,0,1]])
+        else:
+            print("ERROR" + i)
+        labels = np.insert(labels, len(labels), newrow, axis=0)
+        return labels
 
 #Labels einlesen
-labels=np.empty((0,6))
-for i in df_train['sentiment'].values:
-    if i == "neutral":
-        newrow = np.array([[1,0,0,0,0,0]])
-    elif i == "worry":
-        newrow = np.array([[0,1,0,0,0,0]])
-    elif i == "happiness":
-        newrow = np.array([[0,0,1,0,0,0]])
-    elif i == "sadness":
-        newrow = np.array([[0,0,0,1,0,0]])
-    elif i == "love":
-        newrow = np.array([[0,0,0,0,1,0]])
-    elif i == "hate":
-        newrow = np.array([[0,0,0,0,0,1]])
-    else:
-        print("ERROR" + i)
-    labels = np.insert(labels, len(labels), newrow, axis=0)
-
+labels=convert_labels()
 
 #LAbels für Test einlesen
-labels_test=np.empty((0,6))
-for i in df_test['sentiment'].values:
-    if i == "neutral":
-        newrow = np.array([[1,0,0,0,0,0]])
-    elif i == "worry":
-        newrow = np.array([[0,1,0,0,0,0]])
-    elif i == "happiness":
-        newrow = np.array([[0,0,1,0,0,0]])
-    elif i == "sadness":
-        newrow = np.array([[0,0,0,1,0,0]])
-    elif i == "love":
-        newrow = np.array([[0,0,0,0,1,0]])
-    elif i == "hate":
-        newrow = np.array([[0,0,0,0,0,1]])
-    else:
-        print("ERROR" + i)
-    labels_test = np.insert(labels_test, len(labels_test), newrow, axis=0)
-
-
-
+labels_test=convert_labels()
 
 #-------START NN-------
 
